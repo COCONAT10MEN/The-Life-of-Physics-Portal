@@ -1,7 +1,7 @@
 'use client';
 
 import * as z from 'zod';
-import axios from 'axios';
+import { api } from '@/frontend/lib/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
@@ -16,10 +16,10 @@ import {
 	FormLabel,
 	FormItem,
 	FormMessage,
-} from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useGlobalLoading } from '@/components/providers/loading-provider';
+} from '@/frontend/components/ui/form';
+import { Button } from '@/frontend/components/ui/button';
+import { Input } from '@/frontend/components/ui/input';
+import { useGlobalLoading } from '@/frontend/components/providers/loading-provider';
 
 const formSchema = z.object({
 	title: z.string().min(1, {
@@ -44,7 +44,7 @@ const CreateNewCoursePage = () => {
 		startLoading();
 
 		try {
-			const response = await axios.post('/api/courses', values);
+			const response = await api.post('/api/courses', values);
 			router.push(`/teacher/courses/${response.data.id}`);
 			toast.success('Lesson created successfully');
 		} catch (error) {

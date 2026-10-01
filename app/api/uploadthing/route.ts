@@ -1,8 +1,2 @@
-import { createRouteHandler } from "uploadthing/next";
- 
-import { ourFileRouter } from "./core";
- 
-// Export routes for Next App Router
-export const { GET, POST } = createRouteHandler({
-  router: ourFileRouter,
-});
+// Next.js routing adapter. Backend implementation lives in server/.
+export { GET, POST } from '@/server/http/uploadthing/route';

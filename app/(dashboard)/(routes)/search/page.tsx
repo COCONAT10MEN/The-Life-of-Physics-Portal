@@ -1,10 +1,10 @@
-import { db } from '@/lib/db';
-import Categories from './_components/categories';
-import SearchInput from '@/components/search-input';
-import { getCourses } from '@/actions/get-courses';
+import { getCategories } from '@/server/queries/catalog';
+import Categories from '@/frontend/features/search/categories';
+import SearchInput from '@/frontend/components/search-input';
+import { getCourses } from '@/server/queries/get-courses';
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import CoursesList from '@/components/courses-list';
+import CoursesList from '@/frontend/components/courses-list';
 
 interface SearchPageProps {
 	searchParams: {
@@ -18,11 +18,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
 
 	if (!userId) return redirect('/');
 
-	const categories = await db.category.findMany({
-		orderBy: {
-			name: 'asc',
-		},
-	});
+	const categories = await getCategories();
 
 	const courses = await getCourses({
 		userId,

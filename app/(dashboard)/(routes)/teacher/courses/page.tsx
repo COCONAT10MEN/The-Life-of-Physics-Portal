@@ -3,11 +3,11 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { PlusCircle, ShieldCheck } from 'lucide-react';
 
-import { db } from '@/lib/db';
-import { getDbUser } from '@/lib/user';
-import { Button } from '@/components/ui/button';
-import { DataTable } from './_components/data-table';
-import { columns } from './_components/columns';
+import { getTeacherCourses } from '@/server/queries/catalog';
+import { getDbUser } from '@/server/services/user';
+import { Button } from '@/frontend/components/ui/button';
+import { DataTable } from '@/frontend/features/teacher/courses/list/data-table';
+import { columns } from '@/frontend/features/teacher/courses/list/columns';
 
 const CoursesPage = async () => {
 	const { userId } = auth();
@@ -20,11 +20,7 @@ const CoursesPage = async () => {
 	}
 
 	// Authorized admin or teacher: fetch ALL platform courses/lessons from Prisma
-	const courses = await db.course.findMany({
-		orderBy: {
-			createdAt: 'desc',
-		},
-	});
+	const courses = await getTeacherCourses();
 
 	return (
 		<div className="mx-auto w-full max-w-7xl space-y-6 pt-2 pb-16">

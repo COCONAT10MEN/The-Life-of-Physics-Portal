@@ -1,8 +1,8 @@
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-import { getDbUser } from '@/lib/user';
-import { SubmissionsView } from './_components/submissions-view';
+import { getDbUser } from '@/server/services/user';
+import { SubmissionsView } from '@/frontend/features/admin/submissions/submissions-view';
 
 const AdminSubmissionsPage = async () => {
 	const { userId } = auth();

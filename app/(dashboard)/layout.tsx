@@ -1,10 +1,10 @@
 import { auth } from '@clerk/nextjs';
-import Sidebar from '@/components/sidebar';
-import MobileSidebar from '@/app/(dashboard)/_components/mobile-sidebar';
-import Footer from '@/components/footer';
-import SupportModal from '@/components/support-modal';
-import WaitlistOverlay from '@/components/waitlist-overlay';
-import { syncCurrentUser } from '@/lib/user';
+import Sidebar from '@/frontend/components/sidebar';
+import MobileSidebar from '@/frontend/features/dashboard/mobile-sidebar';
+import Footer from '@/frontend/components/footer';
+import SupportModal from '@/frontend/components/support-modal';
+import WaitlistOverlay from '@/frontend/components/waitlist-overlay';
+import { syncCurrentUser } from '@/server/services/user';
 
 const DashboardLayout = async ({ children }: { children: React.ReactNode }) => {
 	const { userId } = auth();

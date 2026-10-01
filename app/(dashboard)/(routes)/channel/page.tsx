@@ -1,5 +1,5 @@
 'use client';
-import { MediaRoom } from '@/components/media-room';
+import { MediaRoom } from '@/frontend/components/media-room';
 import { useAuth } from '@clerk/nextjs';
 
 const Channel = () => {

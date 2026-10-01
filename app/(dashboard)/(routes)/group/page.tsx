@@ -2,24 +2,13 @@ import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { Users, MessageCircle } from 'lucide-react';
 
-import { db } from '@/lib/db';
-import { getUpcomingGroupSessions } from '@/lib/group-schedule';
-import { isTeacher } from '@/lib/teacher';
-import { getDbUser } from '@/lib/user';
-import GroupRosterView, { type PeerMember } from './_components/group-roster-view';
+import { getGroupMembership, getGroupPeers } from '@/server/queries/groups';
+import { getUpcomingGroupSessions } from '@/shared/group-schedule';
+import { isTeacher } from '@/server/services/teacher';
+import { getDbUser } from '@/server/services/user';
+import GroupRosterView from '@/frontend/features/groups/group-roster-view';
 
-function formatTimeAgo(date: Date): string {
-	const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
-	if (seconds < 60) return 'just now';
-	const minutes = Math.floor(seconds / 60);
-	if (minutes < 60) return `${minutes}m ago`;
-	const hours = Math.floor(minutes / 60);
-	if (hours < 24) return `${hours}h ago`;
-	const days = Math.floor(hours / 24);
-	if (days === 1) return 'yesterday';
-	if (days < 30) return `${days} days ago`;
-	return `${Math.floor(days / 30)} mo ago`;
-}
+
 
 const GroupPage = async () => {
 	const { userId, sessionClaims } = auth();
@@ -36,17 +25,7 @@ const GroupPage = async () => {
 	const dbUser = await getDbUser(userId);
 	const targetUserId = dbUser ? dbUser.id : userId;
 
-	const membership = await db.userGroup.findFirst({
-		where: {
-			OR: [
-				...(dbUser ? [{ userId: dbUser.id }] : []),
-				{ userId },
-			],
-		},
-		include: {
-			group: true,
-		},
-	});
+	const membership = await getGroupMembership(userId, dbUser?.id);
 
 	if (!membership || !membership.group) {
 		return (
@@ -95,56 +74,7 @@ const GroupPage = async () => {
 		: null;
 
 	// 2. Fetch all enrolled peers in the same study group
-	const userGroups = await db.userGroup.findMany({
-		where: { groupId: membership.groupId },
-		include: {
-			user: {
-				select: {
-					id: true,
-					name: true,
-					email: true,
-					role: true,
-					submissions: {
-						orderBy: { createdAt: 'desc' },
-						take: 1,
-						include: {
-							chapter: {
-								select: {
-									title: true,
-									course: { select: { title: true } },
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		orderBy: { user: { name: 'asc' } },
-	});
-
-	const peers: PeerMember[] = userGroups.map((ug) => {
-		const u = ug.user;
-		const sub = u.submissions[0] || null;
-		const isCurrentUser = u.id === targetUserId || u.id === userId;
-
-		return {
-			id: u.id,
-			name: u.name || u.email.split('@')[0],
-			email: u.email,
-			role: u.role,
-			isCurrentUser,
-			latestSubmission: sub
-				? {
-						id: sub.id,
-						status: sub.status,
-						createdAt: sub.createdAt.toISOString(),
-						chapterTitle: sub.chapter.title,
-						courseTitle: sub.chapter.course?.title,
-						timeAgo: formatTimeAgo(sub.createdAt),
-				  }
-				: null,
-		};
-	});
+	const peers = await getGroupPeers(membership.groupId, targetUserId, userId);
 
 	return (
 		<GroupRosterView

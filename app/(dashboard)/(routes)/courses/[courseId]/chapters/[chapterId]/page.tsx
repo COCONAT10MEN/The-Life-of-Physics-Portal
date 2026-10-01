@@ -1,8 +1,8 @@
-import { getChapter } from '@/actions/get-chapter';
-import Banner from '@/components/banner';
+import { getChapter } from '@/server/queries/get-chapter';
+import Banner from '@/frontend/components/banner';
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import LessonTabs, { type LessonSegmentItem } from './_components/lesson-tabs';
+import LessonTabs, { type LessonSegmentItem } from '@/frontend/features/courses/lesson/lesson-tabs';
 
 const ChapterIdPage = async ({
 	params,

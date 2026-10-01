@@ -1,8 +1,8 @@
 'use client';
 
-import { IconBadge } from '@/components/icon-badge';
+import { IconBadge } from '@/frontend/components/icon-badge';
 import { LayoutDashboard } from 'lucide-react';
-import DashboardForm from './_components/dashboard-form';
+import DashboardForm from '@/frontend/features/personalization/dashboard-form';
 
 const Personalization = () => {
 	return (

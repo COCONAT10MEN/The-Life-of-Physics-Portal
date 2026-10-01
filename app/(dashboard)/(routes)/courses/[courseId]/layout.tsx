@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { db } from '@/lib/db';
+import { getCourseIdentity } from '@/server/queries/catalog';
 
 const CourseLayout = async ({
 	children,
@@ -15,14 +15,7 @@ const CourseLayout = async ({
 		return redirect('/');
 	}
 
-	const course = await db.course.findUnique({
-		where: {
-			id: params.courseId,
-		},
-		select: {
-			id: true,
-		},
-	});
+	const course = await getCourseIdentity(params.courseId);
 
 	if (!course) {
 		return redirect('/');

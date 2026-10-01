@@ -4,9 +4,14 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev -H 0.0.0.0 -p 3000",
-		"build": "next build",
+		"build": "npm run check:boundaries && next build",
 		"start": "next start",
-		"lint": "next lint",
+		"lint": "next lint --dir app --dir frontend --dir server --dir shared",
+		"typecheck": "tsc --noEmit",
+		"check:boundaries": "node scripts/check-boundaries.cjs",
+		"test:architecture": "node --test scripts/check-boundaries.test.cjs",
+		"test": "node --test scripts/check-boundaries.test.cjs scripts/backend.test.cjs scripts/countdown.test.cjs",
+		"check": "npm test && npm run check:boundaries && npm run typecheck && npm run lint",
 		"postinstall": "prisma generate"
 	},
 	"dependencies": {
@@ -68,7 +73,8 @@
 		"typescript": "5.2.2",
 		"uploadthing": "^7.7.4",
 		"zod": "^3.22.4",
-		"zustand": "^4.4.4"
+		"zustand": "^4.4.4",
+		"server-only": "0.0.1"
 	},
 	"devDependencies": {
 		"prisma": "^5.22.0"

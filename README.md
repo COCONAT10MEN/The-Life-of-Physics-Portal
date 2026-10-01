@@ -1,6 +1,8 @@
 # Learning Management System
 
-A fullstack Learning Management System (LMS) built with Next.js, Prisma, MySQL, and modern frontend technologies. This project enables educators to create, manage, and deliver online courses, while providing students with an interactive and engaging learning experience.
+A fullstack Learning Management System (LMS) built with Next.js, Prisma, PostgreSQL, and modern frontend technologies. This project enables educators to create, manage, and deliver online courses, while providing students with an interactive and engaging learning experience.
+
+The frontend and backend have distinct code layers within one Next.js deployment. See [the architecture guide](docs/architecture.md) for request flow, dependency rules, and how to add features.
 
 [Live Demo](https://lms.shounoop.vercel.app)
 
@@ -45,7 +47,7 @@ A fullstack Learning Management System (LMS) built with Next.js, Prisma, MySQL, 
 
 - **Frontend:** Next.js, React, Tailwind CSS, Radix UI, Clerk Auth
 - **Backend:** Next.js API routes, Prisma ORM
-- **Database:** MySQL (PlanetScale compatible)
+- **Database:** PostgreSQL
 - **Video:** Mux
 - **Other:** Zustand, Zod, React Hook Form, UploadThing, LiveKit
 
@@ -55,7 +57,7 @@ A fullstack Learning Management System (LMS) built with Next.js, Prisma, MySQL, 
 
 ### Prerequisites
 - Node.js >= 18
-- MySQL database (PlanetScale or local)
+- PostgreSQL database
 - [Mux](https://mux.com/) and [Clerk](https://clerk.dev/) accounts for full functionality
 
 ### Installation
@@ -71,12 +73,13 @@ npm install
 Create a `.env` file in the root directory and add the following:
 
 ```
-DATABASE_URL=your_mysql_connection_string
+DATABASE_URL=your_postgres_connection_string
+DATABASE_URL_UNPOOLED=your_direct_postgres_connection_string
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
 MUX_TOKEN_ID=your_mux_token_id
 MUX_TOKEN_SECRET=your_mux_token_secret
-UPLOADTHING_SECRET=your_uploadthing_secret
+UPLOADTHING_TOKEN=your_uploadthing_token
 ```
 
 ### Database Setup
@@ -105,17 +108,19 @@ See [`prisma/schema.prisma`](prisma/schema.prisma) for details.
 ## Folder Structure
 
 ```
-├── actions/         # Server actions and business logic
-├── app/             # Next.js app directory (routes, pages, layouts)
-├── components/      # Reusable React components
-├── constants/       # App-wide constants
-├── hooks/           # Custom React hooks
-├── lib/             # Utility functions and libraries
-├── prisma/          # Prisma schema and migrations
+├── app/             # Next.js routing, server composition, and API adapters
+├── frontend/        # Components, feature views, hooks, and browser API client
+├── server/          # HTTP handlers, queries, services, integrations, and Prisma client
+├── shared/          # Presentation contracts, constants, and pure utilities
+├── prisma/          # Database schema
 ├── public/          # Static assets (images, icons)
-├── scripts/         # Utility scripts
-├── types.ts         # TypeScript types
+├── scripts/         # Utility scripts and validation
+├── docs/            # Architecture and development guidance
 ```
+
+Run `npm run check` for backend/architecture tests, dependency checks, TypeScript,
+and lint. Run `npm run build` to validate a production build; it also enforces
+the frontend/backend boundaries.
 
 ---
 

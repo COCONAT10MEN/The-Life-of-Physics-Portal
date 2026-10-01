@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
-import { getDbUser } from '@/lib/user';
+import { getDbUser } from '@/server/services/user';
 
 const TeacherLayout = async ({ children }: { children: React.ReactNode }) => {
 	const { userId } = auth();

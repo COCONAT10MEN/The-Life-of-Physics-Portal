@@ -1,4 +1,4 @@
-import LoadingOverlay from '@/components/loading-overlay';
+import LoadingOverlay from '@/frontend/components/loading-overlay';
 
 const Loading = () => <LoadingOverlay message="Loading page..." />;
 

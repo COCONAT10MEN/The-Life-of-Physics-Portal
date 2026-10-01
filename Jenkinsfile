@@ -8,7 +8,12 @@ pipeline {
     stages {
         stage("install") {
             steps {
-                sh 'npm install'
+                sh 'npm ci'
+            }
+        }
+        stage("validate") {
+            steps {
+                sh 'npm run check'
             }
         }
         stage("build") {

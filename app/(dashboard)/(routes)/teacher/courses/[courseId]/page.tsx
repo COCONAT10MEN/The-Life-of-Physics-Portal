@@ -3,16 +3,16 @@ import { ArrowLeft, LayoutDashboard, ListChecks, ShieldCheck } from 'lucide-reac
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { db } from '@/lib/db';
-import { getDbUser } from '@/lib/user';
-import { IconBadge } from '@/components/icon-badge';
-import Banner from '@/components/banner';
-import TitleForm from './_components/title-form';
-import DescriptionForm from './_components/description-form';
-import ImageForm from './_components/image-form';
-import ChapterNumberForm from './_components/chapter-number-form';
-import ChaptersForm from './_components/chapters-form';
-import Actions from './_components/actions';
+import { getTeacherCourse } from '@/server/queries/catalog';
+import { getDbUser } from '@/server/services/user';
+import { IconBadge } from '@/frontend/components/icon-badge';
+import Banner from '@/frontend/components/banner';
+import TitleForm from '@/frontend/features/teacher/courses/editor/title-form';
+import DescriptionForm from '@/frontend/features/teacher/courses/editor/description-form';
+import ImageForm from '@/frontend/features/teacher/courses/editor/image-form';
+import ChapterNumberForm from '@/frontend/features/teacher/courses/editor/chapter-number-form';
+import ChaptersForm from '@/frontend/features/teacher/courses/editor/chapters-form';
+import Actions from '@/frontend/features/teacher/courses/editor/actions';
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
 	const { userId } = auth();
@@ -26,14 +26,7 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
 		return redirect('/');
 	}
 
-	const course = await db.course.findUnique({
-		where: {
-			id: params.courseId,
-		},
-		include: {
-			chapters: { orderBy: { position: 'asc' } },
-		},
-	});
+	const course = await getTeacherCourse(params.courseId);
 
 	if (!course) {
 		return redirect('/');

@@ -1,15 +1,15 @@
 'use client';
 
-import { Preview } from '@/components/preview';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Preview } from '@/frontend/components/preview';
+import { Button } from '@/frontend/components/ui/button';
+import { cn } from '@/shared/utils';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
-import FeedbackItem from './_components/feedback-item';
-import FeedbackForm from './_components/feedback-form';
+import FeedbackItem from '@/frontend/features/courses/feedback/feedback-item';
+import FeedbackForm from '@/frontend/features/courses/feedback/feedback-form';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import type { Feedback } from '@prisma/client';
+import { api } from '@/frontend/lib/api';
+import type { Feedback } from '@/shared/contracts/courses';
 import { useAuth } from '@clerk/nextjs';
 
 const CourseDetailPage = ({ params }: { params: { courseId: string } }) => {
@@ -24,7 +24,7 @@ const CourseDetailPage = ({ params }: { params: { courseId: string } }) => {
 	useEffect(() => {
 		(async () => {
 			try {
-				const res = await axios.get(`/api/courses/${courseId}`);
+				const res = await api.get(`/api/courses/${courseId}`);
 
 				setCourse(res.data);
 			} catch (error) {
@@ -36,7 +36,7 @@ const CourseDetailPage = ({ params }: { params: { courseId: string } }) => {
 	useEffect(() => {
 		(async () => {
 			try {
-				const res = await axios.get(`/api/courses/${courseId}/feedbacks`);
+				const res = await api.get(`/api/courses/${courseId}/feedbacks`);
 
 				setFeedbacks(res.data);
 			} catch (error) {

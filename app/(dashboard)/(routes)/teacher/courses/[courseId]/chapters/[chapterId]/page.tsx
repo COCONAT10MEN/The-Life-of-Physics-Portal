@@ -3,14 +3,14 @@ import { ArrowLeft, FileText, LayoutDashboard, ShieldCheck } from 'lucide-react'
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { db } from '@/lib/db';
-import { getDbUser } from '@/lib/user';
-import { IconBadge } from '@/components/icon-badge';
-import Banner from '@/components/banner';
-import ChapterTitleForm from './_components/chapter-title-form';
-import ChapterDescriptionForm from './_components/chapter-description-form';
-import ChapterActions from './_components/chapter-actions';
-import ChapterContentTypeForm from './_components/chapter-content-type-form';
+import { getTeacherChapter } from '@/server/queries/catalog';
+import { getDbUser } from '@/server/services/user';
+import { IconBadge } from '@/frontend/components/icon-badge';
+import Banner from '@/frontend/components/banner';
+import ChapterTitleForm from '@/frontend/features/teacher/chapters/editor/chapter-title-form';
+import ChapterDescriptionForm from '@/frontend/features/teacher/chapters/editor/chapter-description-form';
+import ChapterActions from '@/frontend/features/teacher/chapters/editor/chapter-actions';
+import ChapterContentTypeForm from '@/frontend/features/teacher/chapters/editor/chapter-content-type-form';
 
 const ChapterIdPage = async ({
 	params,
@@ -28,16 +28,7 @@ const ChapterIdPage = async ({
 		return redirect('/');
 	}
 
-	const chapter = await db.chapter.findUnique({
-		where: {
-			id: params.chapterId,
-			courseId: params.courseId,
-		},
-		include: {
-			muxData: true,
-			attachments: { orderBy: { createdAt: 'desc' } },
-		},
-	});
+	const chapter = await getTeacherChapter(params.courseId, params.chapterId);
 
 	if (!chapter) {
 		return redirect('/');

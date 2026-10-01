@@ -2,12 +2,12 @@ import { ClerkProvider, auth } from '@clerk/nextjs';
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { ToastProvider } from '@/components/providers/toast-provider';
-import { ThemeProvider } from '@/components/theme-provider';
-import FacebookMessenger from '@/components/facebook-messenger';
-import { isTeacher } from '@/lib/teacher';
-import { LoadingProvider } from '@/components/providers/loading-provider';
-import ScrollToTop from '@/components/scroll-to-top';
+import { ToastProvider } from '@/frontend/components/providers/toast-provider';
+import { ThemeProvider } from '@/frontend/components/theme-provider';
+import FacebookMessenger from '@/frontend/components/facebook-messenger';
+import { isTeacher } from '@/server/services/teacher';
+import { LoadingProvider } from '@/frontend/components/providers/loading-provider';
+import ScrollToTop from '@/frontend/components/scroll-to-top';
 
 const inter = Inter({ subsets: ['latin'] });
 
