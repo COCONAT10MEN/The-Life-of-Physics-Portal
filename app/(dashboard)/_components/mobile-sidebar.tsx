@@ -41,8 +41,7 @@ export const MobileSidebar = ({ initialRole }: MobileSidebarProps) => {
 
 		<SheetContent
 		side="left"
-		className="w-72 border-none bg-transparent p-0 shadow-none outline-none"
-		hideCloseButton={true}
+		className="w-72 border-none bg-transparent p-0 shadow-none outline-none [&>button]:hidden"
 		>
 		<Sidebar
 		initialRole={initialRole}
