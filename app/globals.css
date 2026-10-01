@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+:root {
+  height: 100%;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 190 100% 36%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 190 85% 94%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 0 0% 100%;
+    --ring: 190 100% 36%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-slate-50 text-foreground;
+  }
+}
+
+@layer components {
+  .physics-card {
+    @apply rounded-xl border border-slate-200 bg-white shadow-sm;
+  }
+
+  .physics-video-frame {
+    @apply overflow-hidden rounded-xl border border-slate-200 bg-black shadow-sm;
+  }
+
+  .textbook-card {
+    @apply relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-6 md:p-8 shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+
+  .textbook-banner {
+    @apply relative overflow-hidden rounded-3xl border-2 border-cyan-500/30 bg-slate-900 text-white p-6 md:p-8 shadow-lg;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hover-lift {
+    @apply transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-md active:translate-y-0;
+  }
+  .active-scale {
+    @apply transition-transform duration-150 active:scale-[0.97] cursor-pointer;
+  }
+}
+
+.ql-container {
+  font-size: 16px !important;
+}
+
+@import "@uploadthing/react/styles.css";
+
+/* FIX: Clerk Profile Popover Touch Lock inside Radix Mobile Sheet */
+.cl-userButtonPopoverCard,
+.cl-popoverBox,
+.cl-userButtonPopoverMain {
+  pointer-events: auto !important;
+  z-index: 99999 !important;
+}

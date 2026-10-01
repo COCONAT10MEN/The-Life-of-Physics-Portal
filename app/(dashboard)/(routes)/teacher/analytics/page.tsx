@@ -1,0 +1,33 @@
+import { getAnalytics } from '@/actions/get-analytics';
+import { auth } from '@clerk/nextjs';
+import { redirect } from 'next/navigation';
+import { getDbUser } from '@/lib/user';
+import DataCard from './_components/data-card';
+import { Chart } from './_components/chart';
+
+const AnalyticsPage = async () => {
+	const { userId } = auth();
+
+	if (!userId) return redirect('/');
+
+	const dbUser = await getDbUser(userId);
+	if (!dbUser || dbUser.role === 'STUDENT' || (dbUser.role as string) === 'student') {
+		return redirect('/');
+	}
+
+	const { data, totalViews, totalCourses } = await getAnalytics(userId);
+
+	return (
+		<div className="p-6">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+				<DataCard label="Total lesson views" value={totalViews} />
+
+				<DataCard label="Lessons created" value={totalCourses} />
+			</div>
+
+			{data.length > 0 && <Chart data={data} />}
+		</div>
+	);
+};
+
+export default AnalyticsPage;

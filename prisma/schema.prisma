@@ -1,0 +1,283 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Course {
+  id            String   @id @default(uuid())
+  userId        String
+  title         String   @db.Text
+  isPublished   Boolean  @default(false)
+  description   String?  @db.Text
+  imageUrl      String?  @db.Text
+  categoryId    String?
+  chapterNumber Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  category        Category?        @relation(fields: [categoryId], references: [id])
+  chapters        Chapter[]
+  attachments     Attachment[]
+  Feedback        Feedback[]
+  CourseStatistic CourseStatistic?
+
+  @@index([categoryId])
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+
+  courses Course[]
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  fileKey   String?
+  fileSize  Int?     @default(0)
+  courseId  String
+  chapterId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chapter Chapter? @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+  @@index([chapterId])
+}
+
+model Chapter {
+  id               String   @id @default(uuid())
+  title            String
+  position         Int
+  isPublished      Boolean  @default(false)
+  courseId         String
+  description      String?  @db.Text
+  videoUrl         String?  @db.Text
+  solutionVideoUrl String?  @db.Text
+  isFree           Boolean  @default(false)
+  contentType      String?  @default("VIDEO_EXPLANATION")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  userProgresses      UserProgress[]
+  homeworkSubmissions Submission[]
+  attachments         Attachment[]
+  notes               Note[]
+  muxData             MuxData?
+  course              Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@index([courseId])
+}
+
+// MuxData is the data that is stored in Mux Video
+model MuxData {
+  id String @id @default(uuid())
+
+  // assetId is the ID of the asset in Mux Video that contains the video (asset is a container for a video)
+  assetId   String
+  chapterId String @unique
+
+  // playbackId is the ID of the playback in Mux Video that contains the video (playback is a playable video)
+  playbackId String?
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+}
+
+model UserProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  chapterId   String
+  isCompleted Boolean  @default(false)
+  isWatched   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chapterId])
+  @@index([chapterId])
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  ASSISTANT
+  STUDENT
+}
+
+model User {
+  id          String    @id @default(uuid())
+  externalId  String    @unique
+  email       String    @unique
+  name        String?
+  role        Role      @default(STUDENT)
+  isApproved  Boolean   @default(false)
+  approvedAt  DateTime?
+  approvedBy  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userGroups  UserGroup[]
+  submissions Submission[]
+}
+
+model Submission {
+  id         String           @id @default(uuid())
+  userId     String
+  userName   String?
+  chapterId  String
+  fileUrl    String           @db.Text
+  fileKey    String?
+  fileSize   Int?             @default(0)
+  status     SubmissionStatus @default(PENDING_APPROVAL)
+  approvedBy String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chapter Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chapterId])
+  @@index([chapterId])
+  @@index([userId])
+  @@map("HomeworkSubmission")
+}
+
+enum SubmissionStatus {
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+model Progress {
+  id                  String   @id @default(uuid())
+  userId              String
+  chapterId           String
+  explanationWatchPct Float    @default(0)
+  solutionWatchPct    Float    @default(0)
+  isWatched           Boolean  @default(false)
+  updatedAt           DateTime @updatedAt
+
+  @@unique([userId, chapterId])
+  @@index([chapterId])
+}
+
+model Group {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  schedule  Json?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  students  UserGroup[]
+}
+
+model UserGroup {
+  id        String   @id @default(uuid())
+  userId    String
+  groupId   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, groupId])
+  @@index([groupId])
+  @@index([userId])
+}
+
+model GroupQuestion {
+  id         String   @id @default(uuid())
+  groupId    String
+  userId     String
+  userName   String
+  userRole   String   @default("student")
+  question   String   @db.Text
+  answer     String?  @db.Text
+  answeredBy String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([groupId])
+}
+
+enum TicketCategory {
+  VIDEO_PLAYBACK
+  HOMEWORK_UPLOAD
+  ACCOUNT_ACCESS
+  OTHER
+
+  @@map("SupportIssueCategory")
+}
+
+model SupportTicket {
+  id           String         @id @default(uuid())
+  userId       String?
+  studentEmail String
+  category     TicketCategory @map("issueCategory")
+  message      String         @db.Text
+  status       String         @default("OPEN")
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  userId    String
+  chapterId String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chapter Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+  @@index([chapterId])
+}
+
+model Personalization {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  dashboard String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Feedback {
+  id        String @id @default(uuid())
+  userId    String
+  courseId  String
+  content   String
+  fullName  String
+  avatarUrl String
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+}
+
+model CourseStatistic {
+  id         String   @id @default(uuid())
+  courseId   String
+  categoryId String
+  views      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId])
+  @@index([courseId])
+}
